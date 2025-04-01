@@ -1,6 +1,6 @@
-(function(window, document, undefined) {
+(function (window, document, undefined) {
     'use strict';
-    (function(factory) {
+    (function (factory) {
         if (typeof define === 'function' && define.amd) {
             // Register as an anonymous AMD module.
             define(['jquery'], factory);
@@ -11,7 +11,7 @@
             // Browser globals
             factory(window.jQuery);
         }
-    }(function($) {
+    }(function ($) {
         // Create the defaults once
         var pluginName = 'webuiPopover';
         var pluginClass = 'webui-popover';
@@ -82,15 +82,15 @@
         var _offsetOut = -2000; // the value offset  out of the screen
         var $document = $(document);
 
-        var toNumber = function(numeric, fallback) {
+        var toNumber = function (numeric, fallback) {
             return isNaN(numeric) ? (fallback || 0) : Number(numeric);
         };
 
-        var getPopFromElement = function($element) {
+        var getPopFromElement = function ($element) {
             return $element.data('plugin_' + pluginName);
         };
 
-        var hideAllPop = function() {
+        var hideAllPop = function () {
             var pop = null;
             for (var i = 0; i < _srcElements.length; i++) {
                 pop = getPopFromElement(_srcElements[i]);
@@ -101,7 +101,7 @@
             $document.trigger('hiddenAll.' + pluginType);
         };
 
-        var hideOtherPops = function(currentPop) {
+        var hideOtherPops = function (currentPop) {
             var pop = null;
             for (var i = 0; i < _srcElements.length; i++) {
                 pop = getPopFromElement(_srcElements[i]);
@@ -114,7 +114,7 @@
 
         var isMobile = ('ontouchstart' in document.documentElement) && (/Mobi/.test(navigator.userAgent));
 
-        var pointerEventToXY = function(e) {
+        var pointerEventToXY = function (e) {
             var out = {
                 x: 0,
                 y: 0
@@ -155,7 +155,7 @@
 
         WebuiPopover.prototype = {
             //init webui popover
-            init: function() {
+            init: function () {
                 if (this.$element[0] instanceof document.constructor && !this.options.selector) {
                     throw new Error('`selector` option must be specified when initializing ' + this.type + ' on the window.document object!');
                 }
@@ -197,7 +197,7 @@
 
             },
             /* api methods and actions */
-            destroy: function() {
+            destroy: function () {
                 var index = -1;
 
                 for (var i = 0; i < _srcElements.length; i++) {
@@ -221,10 +221,10 @@
                     this.$target.remove();
                 }
             },
-            getDelegateOptions: function() {
+            getDelegateOptions: function () {
                 var options = {};
 
-                this._options && $.each(this._options, function(key, value) {
+                this._options && $.each(this._options, function (key, value) {
                     if (defaults[key] !== value) {
                         options[key] = value;
                     }
@@ -235,7 +235,7 @@
                 param: force    boolean value, if value is true then force hide the popover
                 param: event    dom event,
             */
-            hide: function(force, event) {
+            hide: function (force, event) {
 
                 if (!force && this.getTrigger() === 'sticky') {
                     return;
@@ -259,7 +259,7 @@
                 if (this.$target) {
                     this.$target.removeClass('in').addClass(this.getHideAnimation());
                     var that = this;
-                    setTimeout(function() {
+                    setTimeout(function () {
                         that.$target.hide();
                         if (!that.getCache()) {
                             that.$target.remove();
@@ -278,19 +278,19 @@
                 }
 
             },
-            resetAutoHide: function() {
+            resetAutoHide: function () {
                 var that = this;
                 var autoHide = that.getAutoHide();
                 if (autoHide) {
                     if (that.autoHideHandler) {
                         clearTimeout(that.autoHideHandler);
                     }
-                    that.autoHideHandler = setTimeout(function() {
+                    that.autoHideHandler = setTimeout(function () {
                         that.hide();
                     }, autoHide);
                 }
             },
-            delegate: function(eventTarget) {
+            delegate: function (eventTarget) {
                 var self = $(eventTarget).data('plugin_' + pluginName);
                 if (!self) {
                     self = new WebuiPopover(eventTarget, this.getDelegateOptions());
@@ -298,7 +298,7 @@
                 }
                 return self;
             },
-            toggle: function(e) {
+            toggle: function (e) {
                 var self = this;
                 if (e) {
                     e.preventDefault();
@@ -309,20 +309,26 @@
                 }
                 self[self.getTarget().hasClass('in') ? 'hide' : 'show']();
             },
-            hideAll: function() {
+            hideAll: function () {
                 hideAllPop();
             },
-            hideOthers: function() {
+            hideOthers: function () {
                 hideOtherPops(this);
             },
             /*core method ,show popover */
-            show: function() {
+            show: function () {
                 if (this._opened) {
                     return;
                 }
                 //removeAllTargets();
                 var
                     $target = this.getTarget().removeClass().addClass(pluginClass).addClass(this._customTargetClass);
+                // 判断_customTargetClass中是否含有webui-popover-inverse类，如果有，则添加webui-popover-inverse类，如果没有，则移除
+                if (this._customTargetClass && this._customTargetClass.includes('webui-popover-inverse')) {
+                    $target.addClass('webui-popover-inverse');
+                } else {
+                    $target.removeClass('webui-popover-inverse');
+                }
                 if (!this.options.multi) {
                     this.hideOthers();
                 }
@@ -359,7 +365,8 @@
                 this._opened = true;
                 this.resetAutoHide();
             },
-            displayContent: function() {
+
+            displayContent: function () {
                 var
                     //element postion
                     elementPos = this.getElementPosition(),
@@ -512,15 +519,21 @@
                 this.$element.trigger('shown.' + pluginType, [this.$target]);
             },
 
-            isTargetLoaded: function() {
+            isTargetLoaded: function () {
                 return this.getTarget().find('i.glyphicon-refresh').length === 0;
             },
 
             /*getter setters */
-            getTriggerElement: function() {
+            getTriggerElement: function () {
                 return this.$element;
             },
-            getTarget: function() {
+            setCustomTargetClass: function (className) {
+                if (className && typeof className === 'string') {
+                    this._customTargetClass = className;
+                }
+                return this._customTargetClass;
+            },
+            getTarget: function () {
                 if (!this.$target) {
                     var id = pluginName + this._idSeed;
                     this.$target = $(this.options.template)
@@ -533,38 +546,38 @@
                 }
                 return this.$target;
             },
-            removeTarget: function() {
+            removeTarget: function () {
                 this.$target.remove();
                 this.$target = null;
                 this.$contentElement = null;
             },
-            getTitleElement: function() {
+            getTitleElement: function () {
                 return this.getTarget().find('.' + pluginClass + '-title');
             },
-            getContentElement: function() {
+            getContentElement: function () {
                 if (!this.$contentElement) {
                     this.$contentElement = this.getTarget().find('.' + pluginClass + '-content');
                 }
                 return this.$contentElement;
             },
-            getTitle: function() {
+            getTitle: function () {
                 return this.$element.attr('data-title') || this.options.title || this.$element.attr('title');
             },
-            getUrl: function() {
+            getUrl: function () {
                 return this.$element.attr('data-url') || this.options.url;
             },
-            getAutoHide: function() {
+            getAutoHide: function () {
                 return this.$element.attr('data-auto-hide') || this.options.autoHide;
             },
-            getOffsetTop: function() {
+            getOffsetTop: function () {
                 return toNumber(this.$element.attr('data-offset-top')) || this.options.offsetTop;
             },
-            getOffsetLeft: function() {
+            getOffsetLeft: function () {
                 return toNumber(this.$element.attr('data-offset-left')) || this.options.offsetLeft;
             },
-            getCache: function() {
+            getCache: function () {
                 var dataAttr = this.$element.attr('data-cache');
-                if (typeof(dataAttr) !== 'undefined') {
+                if (typeof (dataAttr) !== 'undefined') {
                     switch (dataAttr.toLowerCase()) {
                         case 'true':
                         case 'yes':
@@ -578,32 +591,32 @@
                 }
                 return this.options.cache;
             },
-            getTrigger: function() {
+            getTrigger: function () {
                 return this.$element.attr('data-trigger') || this.options.trigger;
             },
-            getDelayShow: function() {
+            getDelayShow: function () {
                 var dataAttr = this.$element.attr('data-delay-show');
-                if (typeof(dataAttr) !== 'undefined') {
+                if (typeof (dataAttr) !== 'undefined') {
                     return dataAttr;
                 }
                 return this.options.delay.show === 0 ? 0 : this.options.delay.show || 100;
             },
-            getHideDelay: function() {
+            getHideDelay: function () {
                 var dataAttr = this.$element.attr('data-delay-hide');
-                if (typeof(dataAttr) !== 'undefined') {
+                if (typeof (dataAttr) !== 'undefined') {
                     return dataAttr;
                 }
                 return this.options.delay.hide === 0 ? 0 : this.options.delay.hide || 100;
             },
-            getAnimation: function() {
+            getAnimation: function () {
                 var dataAttr = this.$element.attr('data-animation');
                 return dataAttr || this.options.animation;
             },
-            getHideAnimation: function() {
+            getHideAnimation: function () {
                 var ani = this.getAnimation();
                 return ani ? ani + '-out' : 'out';
             },
-            setTitle: function(title) {
+            setTitle: function (title) {
                 var $titleEl = this.getTitleElement();
                 if (title) {
                     //check rtl
@@ -615,16 +628,16 @@
                     $titleEl.remove();
                 }
             },
-            hasContent: function() {
+            hasContent: function () {
                 return this.getContent();
             },
-            canEmptyHide: function() {
+            canEmptyHide: function () {
                 return this.options.hideEmpty && this.options.type === 'html';
             },
-            getIframe: function() {
+            getIframe: function () {
                 var $iframe = $('<iframe></iframe>').attr('src', this.getUrl());
                 var self = this;
-                $.each(this._defaults.iframeOptions, function(opt) {
+                $.each(this._defaults.iframeOptions, function (opt) {
                     if (typeof self.options.iframeOptions[opt] !== 'undefined') {
                         $iframe.attr(opt, self.options.iframeOptions[opt]);
                     }
@@ -632,7 +645,7 @@
 
                 return $iframe;
             },
-            getContent: function() {
+            getContent: function () {
                 if (this.getUrl()) {
                     switch (this.options.type) {
                         case 'iframe':
@@ -667,7 +680,7 @@
                 }
                 return this.content;
             },
-            setContent: function(content) {
+            setContent: function (content) {
                 var $target = this.getTarget();
                 var $ct = this.getContentElement();
                 if (typeof content === 'string') {
@@ -683,10 +696,10 @@
                 }
                 this.$target = $target;
             },
-            isAsync: function() {
+            isAsync: function () {
                 return this.options.type === 'async';
             },
-            setContentASync: function(content) {
+            setContentASync: function (content) {
                 var that = this;
                 if (this.xhr) {
                     return;
@@ -695,12 +708,12 @@
                     url: this.getUrl(),
                     type: this.options.async.type,
                     cache: this.getCache(),
-                    beforeSend: function(xhr, settings) {
+                    beforeSend: function (xhr, settings) {
                         if (that.options.async.before) {
                             that.options.async.before(that, xhr, settings);
                         }
                     },
-                    success: function(data) {
+                    success: function (data) {
                         that.bindBodyEvents();
                         if (content && $.isFunction(content)) {
                             that.content = content.apply(that.$element[0], [data]);
@@ -715,10 +728,10 @@
                             that.options.async.success(that, data);
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         that.xhr = null;
                     },
-                    error: function(xhr, data) {
+                    error: function (xhr, data) {
                         if (that.options.async.error) {
                             that.options.async.error(that, xhr, data);
                         }
@@ -726,7 +739,7 @@
                 });
             },
 
-            bindBodyEvents: function() {
+            bindBodyEvents: function () {
                 if (_isBodyEventHandled) {
                     return;
                 }
@@ -744,7 +757,7 @@
             },
 
             /* event handlers */
-            mouseenterHandler: function(e) {
+            mouseenterHandler: function (e) {
                 var self = this;
 
                 if (e && this.options.selector) {
@@ -754,37 +767,37 @@
                 if (self._timeout) {
                     clearTimeout(self._timeout);
                 }
-                self._enterTimeout = setTimeout(function() {
+                self._enterTimeout = setTimeout(function () {
                     if (!self.getTarget().is(':visible')) {
                         self.show();
                     }
                 }, this.getDelayShow());
             },
-            mouseleaveHandler: function() {
+            mouseleaveHandler: function () {
                 var self = this;
                 clearTimeout(self._enterTimeout);
                 //key point, set the _timeout  then use clearTimeout when mouse leave
-                self._timeout = setTimeout(function() {
+                self._timeout = setTimeout(function () {
                     self.hide();
                 }, this.getHideDelay());
             },
-            escapeHandler: function(e) {
+            escapeHandler: function (e) {
                 if (e.keyCode === 27) {
                     this.hideAll();
                 }
             },
-            bodyTouchStartHandler: function(e) {
+            bodyTouchStartHandler: function (e) {
                 var self = this;
                 var $eventEl = $(e.currentTarget);
-                $eventEl.on('touchend', function(e) {
+                $eventEl.on('touchend', function (e) {
                     self.bodyClickHandler(e);
                     $eventEl.off('touchend');
                 });
-                $eventEl.on('touchmove', function() {
+                $eventEl.on('touchmove', function () {
                     $eventEl.off('touchend');
                 });
             },
-            bodyClickHandler: function(e) {
+            bodyClickHandler: function (e) {
                 _isBodyEventHandled = true;
                 var canHide = true;
                 for (var i = 0; i < _srcElements.length; i++) {
@@ -815,7 +828,7 @@
             */
 
             //reset and init the target events;
-            initTargetEvents: function() {
+            initTargetEvents: function () {
                 if (this.getTrigger() === 'hover') {
                     this.$target
                         .off('mouseenter mouseleave')
@@ -827,7 +840,7 @@
             },
             /* utils methods */
             //caculate placement of the popover
-            getPlacement: function(pos) {
+            getPlacement: function (pos) {
                 var
                     placement,
                     container = this.options.container,
@@ -840,7 +853,7 @@
                 //arrowSize = 20;
 
                 //if placement equals auto，caculate the placement by element information;
-                if (typeof(this.options.placement) === 'function') {
+                if (typeof (this.options.placement) === 'function') {
                     placement = this.options.placement.call(this, this.getTarget()[0], this.$element[0]);
                 } else {
                     placement = this.$element.data('placement') || this.options.placement;
@@ -933,7 +946,7 @@
                 }
                 return placement;
             },
-            getElementPosition: function() {
+            getElementPosition: function () {
                 // If the container is the body or normal conatiner, just use $element.offset()
                 var elRect = this.$element[0].getBoundingClientRect();
                 var container = this.options.container;
@@ -963,7 +976,7 @@
                 }
             },
 
-            getTargetPositin: function(elementPos, placement, targetWidth, targetHeight) {
+            getTargetPositin: function (elementPos, placement, targetWidth, targetHeight) {
                 var pos = elementPos,
                     container = this.options.container,
                     //clientWidth = container.innerWidth(),
@@ -1100,9 +1113,9 @@
                 };
             }
         };
-        $.fn[pluginName] = function(options, noInit) {
+        $.fn[pluginName] = function (options, noInit) {
             var results = [];
-            var $result = this.each(function() {
+            var $result = this.each(function () {
 
                 var webuiPopover = $.data(this, 'plugin_' + pluginName);
                 if (!webuiPopover) {
@@ -1131,37 +1144,37 @@
         };
 
         //Global object exposes to window.
-        var webuiPopovers = (function() {
-            var _hideAll = function() {
+        var webuiPopovers = (function () {
+            var _hideAll = function () {
                 hideAllPop();
             };
-            var _create = function(selector, options) {
+            var _create = function (selector, options) {
                 options = options || {};
                 $(selector).webuiPopover(options);
             };
-            var _isCreated = function(selector) {
+            var _isCreated = function (selector) {
                 var created = true;
-                $(selector).each(function(i, item) {
+                $(selector).each(function (i, item) {
                     created = created && $(item).data('plugin_' + pluginName) !== undefined;
                 });
                 return created;
             };
-            var _show = function(selector, options) {
+            var _show = function (selector, options) {
                 if (options) {
                     $(selector).webuiPopover(options).webuiPopover('show');
                 } else {
                     $(selector).webuiPopover('show');
                 }
             };
-            var _hide = function(selector) {
+            var _hide = function (selector) {
                 $(selector).webuiPopover('hide');
             };
 
-            var _setDefaultOptions = function(options) {
+            var _setDefaultOptions = function (options) {
                 defaults = $.extend({}, defaults, options);
             };
 
-            var _updateContent = function(selector, content) {
+            var _updateContent = function (selector, content) {
                 var pop = $(selector).data('plugin_' + pluginName);
                 if (pop) {
                     var cache = pop.getCache();
@@ -1181,7 +1194,7 @@
                 }
             };
 
-            var _updateContentAsync = function(selector, url) {
+            var _updateContentAsync = function (selector, url) {
                 var pop = $(selector).data('plugin_' + pluginName);
                 if (pop) {
                     var cache = pop.getCache();
@@ -1202,19 +1215,25 @@
             };
 
             // 新增 toggleStyle 方法
-            var _toggleStyle = function(style) {
-                var className = 'webui-popover-' + style;
-                _srcElements.forEach(function($element) {
+            var _toggleStyle = function (style) {
+                // 判断是否有
+                var className = 'webui-popover-inverse';
+                _srcElements.forEach(function ($element) {
                     var $popover = $element.data('plugin_' + pluginName).getTarget();
                     if (style === 'inverse') {
-                        if (!$popover.hasClass(className)) {
-                            $popover.addClass(className);
-                        }
+                        $popover.addClass(className);
                     } else if (style === '') {
-                        if ($popover.hasClass(className)) {
-                            $popover.removeClass(className);
-                        }
+                        $popover.removeClass(className);
                     }
+                    $element.data('plugin_' + pluginName).setCustomTargetClass($popover.attr('class'))
+                    // var $popover = $element.data('plugin_' + pluginName).getTarget();
+                    // // 输出$popover所有的类名
+                    // if (style === 'inverse') {
+                    //     $popover.addClass(className);
+                    // } else if (style === '') {
+                    //     $popover.removeClass(className);
+                    // }
+
                 });
             };
 
