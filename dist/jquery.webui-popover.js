@@ -331,6 +331,12 @@
                 //removeAllTargets();
                 var
                     $target = this.getTarget().removeClass().addClass(pluginClass).addClass(this._customTargetClass);
+                // 判断_customTargetClass中是否含有webui-popover-inverse类，如果有，则添加webui-popover-inverse类，如果没有，则移除
+                if (this._customTargetClass && this._customTargetClass.includes('webui-popover-inverse')) {
+                    $target.addClass('webui-popover-inverse');
+                } else {
+                    $target.removeClass('webui-popover-inverse');
+                }
                 if (!this.options.multi) {
                     this.hideOthers();
                 }
@@ -367,6 +373,7 @@
                 this._opened = true;
                 this.resetAutoHide();
             },
+
             displayContent: function() {
                 var
                     //element postion
@@ -527,6 +534,12 @@
             /*getter setters */
             getTriggerElement: function() {
                 return this.$element;
+            },
+            setCustomTargetClass: function(className) {
+                if (className && typeof className === 'string') {
+                    this._customTargetClass = className;
+                }
+                return this._customTargetClass;
             },
             getTarget: function() {
                 if (!this.$target) {
@@ -1211,18 +1224,16 @@
 
             // 新增 toggleStyle 方法
             var _toggleStyle = function(style) {
-                var className = 'webui-popover-' + style;
+                // 判断是否有
+                var className = 'webui-popover-inverse';
                 _srcElements.forEach(function($element) {
                     var $popover = $element.data('plugin_' + pluginName).getTarget();
                     if (style === 'inverse') {
-                        if (!$popover.hasClass(className)) {
-                            $popover.addClass(className);
-                        }
+                        $popover.addClass(className);
                     } else if (style === '') {
-                        if ($popover.hasClass(className)) {
-                            $popover.removeClass(className);
-                        }
+                        $popover.removeClass(className);
                     }
+                    $element.data('plugin_' + pluginName).setCustomTargetClass($popover.attr('class'));
                 });
             };
 
