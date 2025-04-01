@@ -1226,14 +1226,6 @@
                         $popover.removeClass(className);
                     }
                     $element.data('plugin_' + pluginName).setCustomTargetClass($popover.attr('class'))
-                    // var $popover = $element.data('plugin_' + pluginName).getTarget();
-                    // // 输出$popover所有的类名
-                    // if (style === 'inverse') {
-                    //     $popover.addClass(className);
-                    // } else if (style === '') {
-                    //     $popover.removeClass(className);
-                    // }
-
                 });
             };
 
