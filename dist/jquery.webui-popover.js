@@ -1209,6 +1209,23 @@
                 }
             };
 
+            // 新增 toggleStyle 方法
+            var _toggleStyle = function(style) {
+                var className = 'webui-popover-' + style;
+                _srcElements.forEach(function($element) {
+                    var $popover = $element.data('plugin_' + pluginName).getTarget();
+                    if (style === 'inverse') {
+                        if (!$popover.hasClass(className)) {
+                            $popover.addClass(className);
+                        }
+                    } else if (style === '') {
+                        if ($popover.hasClass(className)) {
+                            $popover.removeClass(className);
+                        }
+                    }
+                });
+            };
+
             return {
                 show: _show,
                 hide: _hide,
@@ -1217,7 +1234,8 @@
                 hideAll: _hideAll,
                 updateContent: _updateContent,
                 updateContentAsync: _updateContentAsync,
-                setDefaultOptions: _setDefaultOptions
+                setDefaultOptions: _setDefaultOptions,
+                toggleStyle: _toggleStyle // 添加 toggleStyle 方法到返回对象中
             };
         })();
         window.WebuiPopovers = webuiPopovers;
